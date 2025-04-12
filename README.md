@@ -21,13 +21,13 @@ El objetivo es permitir al cliente ingresar su nombre, elegir pizzas, revisar su
 
 ## Tecnologías utilizadas
 
-- HTML (por el momento es solo para poder usar el simulador, falta desarrolar)
+- HTML (por el momento es solo para poder usar el simulador, falta desarrollar)
 - JavaScript (puro)
-- Visual Studio COde (editor de codigo)
+- Visual Studio Code (editor de codigo)
 
 ## Cómo usarlo
 
-1. Abrir el archivo `.html` vinculado al script en un navegador.
+1. Abrir el archivo `.html` vinculado al script en un navegador para que inicie el simulador.
 2. Seguir las instrucciones por `alert` y `prompt`.
 3. Usar consola para ver posibles mensajes o el estado del pedido (opcional).
 
@@ -39,3 +39,4 @@ El objetivo es permitir al cliente ingresar su nombre, elegir pizzas, revisar su
 ## Autor
 
 Desarrollado por Migliavacca Ezequiel como parte del curso Full Stack en Coderhouse.
+Mis proyectos: https://github.com/MigliavaccaEzequiel
