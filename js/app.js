@@ -118,17 +118,17 @@ function eliminarProducto() {
     let opcion = prompt(mensaje);
     if (opcion === "0") return;
 
-    let indice = parseInt(opcion) - 1;
-    if (isNaN(indice) || indice < 0 || indice >= pedido.productos.length) {
+    let i = parseInt(opcion) - 1;
+    if (isNaN(i) || i < 0 || i >= pedido.productos.length) {
         alert("Opción inválida.");
         return;
     }
 
-    const producto = pedido.productos[indice];
+    const producto = pedido.productos[i];
     const accion = prompt(`Seleccionaste ${producto.nombre} (Cantidad actual: ${producto.cantidad})\n¿Querés eliminar:\n1 - Todo el producto\n2 - Solo una cantidad`).trim();
 
     if (accion === "1") {
-        pedido.productos.splice(indice, 1);
+        pedido.productos.splice(i, 1);
         alert(`${producto.nombre} fue eliminado del pedido.`);
     } else if (accion === "2") {
         const cantidadAEliminar = parseInt(prompt(`¿Cuántas unidades querés eliminar?`));
@@ -138,7 +138,7 @@ function eliminarProducto() {
         }
 
         if (cantidadAEliminar >= producto.cantidad) {
-            pedido.productos.splice(indice, 1);
+            pedido.productos.splice(i, 1);
             alert(`Se eliminaron todas las unidades de ${producto.nombre}.`);
         } else {
             producto.cantidad -= cantidadAEliminar;
