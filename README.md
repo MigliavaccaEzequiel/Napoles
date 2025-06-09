@@ -1,59 +1,36 @@
 # Simulador de Pedidos - Proyecto JavaScript - Nápoles
-## Descripción
-Este proyecto es un simulador interactivo de pedidos para pizzería "Nápoles", desarrollado en JavaScript como parte de la cursada Full Stack en Coderhouse.
 
-El sistema permite a los usuarios realizar un pedido de forma dinámica desde consola, eligiendo productos, cantidades, y confirmando su orden con opción de modificarla o cancelarla.
+## Descripción  
+Simulador interactivo para realizar pedidos en la pizzería **Nápoles**, desarrollado en JavaScript. Ahora cuenta con una interfaz dinámica basada en el DOM para mejorar la experiencia del usuario.
 
-## Funcionalidades principales
-Solicita el nombre del cliente con validación.
+## Funcionalidades principales  
+- Solicita el nombre del cliente con validación.  
+- Permite seleccionar productos por categoría (Pizzas, Sándwiches, Bebidas).  
+- Agregar productos con cantidad desde la interfaz visual.  
+- Mostrar resumen del pedido en un modal interactivo.  
+- Confirmar o cancelar pedidos con botones en el modal.  
+- Editar cantidades o eliminar productos directamente desde el resumen.  
+- Volver al menú anterior si no se desea seleccionar productos.  
+- Guardar pedidos confirmados en `localStorage`.  
+- Mostrar historial de pedidos anteriores almacenados.  
 
-Permite seleccionar productos por categoría:
+## Tecnologías utilizadas  
+- JavaScript (vanilla) con manipulación del DOM  
+- HTML y CSS para la interfaz  
+- Visual Studio Code (editor)  
 
-* Pizzas
+## Cómo usarlo  
+1. Abrí el archivo `index.html` en un navegador moderno.  
+2. Usá la interfaz para seleccionar categorías y agregar productos al pedido.  
+3. Consultá el resumen del pedido en el modal para confirmar, cancelar o modificar.  
+4. El historial de pedidos confirmados queda almacenado y puede consultarse.  
 
-* Sándwiches
+## Posibles mejoras futuras  
+- Mejorar diseño y hacer la interfaz responsive.  
+- Agregar validaciones más robustas para entradas.  
+- Mostrar totales parciales en tiempo real.  
+- Implementar filtrado y ordenamiento de productos.  
 
-* Bebidas
-
-Posibilidad de:
-
-- Agregar productos con cantidad.
-
-- Ver el resumen y total del pedido.
-
-- Confirmar o cancelar el pedido.
-
-- Eliminar productos específicos o una parte de la cantidad.
-
-- Volver atrás al elegir una categoría si no desea seleccionar ningún producto.
-
-- Guarda los pedidos confirmados en localStorage.
-
-- Muestra un historial de pedidos anteriores almacenados.
-
-## Tecnologías utilizadas
-- JavaScript (vanilla / puro)
-
-- HTML (mínimo, sólo para ejecutar el simulador)
-
-- Visual Studio Code (editor)
-
-## Cómo usarlo
-1- Abrí el archivo HTML vinculado al script en tu navegador.
-
-2- Seguí las instrucciones del simulador mediante alert, prompt y console.log.
-
-3- Para ver los mensajes de confirmación o depuración, podés abrir la consola del navegador (F12).
-
-## Posibles mejoras futuras
-. Integración total con HTML y CSS para una interfaz visual.
-
-. Mejora de validaciones y mensajes de error.
-
-. Ordenar productos por precio, nombre o categoría (no prioritario por ahora).
-
-. Mostrar el subtotal o total parcial del pedido en tiempo real.
-
-## Autor
-Desarrollado por Ezequiel Migliavacca como parte del curso Full Stack en Coderhouse.
-Mis proyectos: https://github.com/MigliavaccaEzequiel
+## Autor  
+Desarrollado por Ezequiel Migliavacca como parte del curso Full Stack en Coderhouse.  
+Mis proyectos: [https://github.com/MigliavaccaEzequiel](https://github.com/MigliavaccaEzequiel)

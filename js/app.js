@@ -1,11 +1,117 @@
-let nombreCliente = prompt("Ingrese su nombre y apellido para dientificar el pedido");
-//Verificar que no este vacio para saber a quien entregarle el pedido
-while (!nombreCliente || nombreCliente.trim() === "") {
-    alert("Debe ingresar un nombre para identificar el pedido.");
-    nombreCliente = prompt("Por favor, ingrese su nombre y apellido para identificar el pedido.");
+let nombreCliente = "";
+const inputNombreCliente = document.getElementById("inputNombreCliente");
+const botonNombreCliente = document.getElementById("botonNombreCliente");
+
+//Enviar nombre del cliente
+botonNombreCliente.addEventListener("click", () => {
+    const nombreIngresado = inputNombreCliente.value.trim();
+
+    if (nombreIngresado === "") {
+        mensajeBienvenida.innerText = "⚠️ Por favor, ingrese su nombre.";
+        mensajeBienvenida.classList.add("text-danger");
+        return;
+    }
+
+    nombreCliente = nombreIngresado;
+    console.log(`Cliente: ${nombreCliente}`);
+
+    // Mostrar mensaje de bienvenida
+    mensajeBienvenida.innerText = `👋 ¡Bienvenido, ${nombreCliente}!`;
+    mensajeBienvenida.classList.remove("text-danger");
+    mensajeBienvenida.classList.add("text-warning");
+    inputNombreCliente.disabled = true;
+    botonNombreCliente.disabled = true;
+});
+
+//Badge del carrito
+function actualizarBadgeCarrito() {
+  const carritoBadge = document.getElementById("carritoBadge");
+  const totalProductos = pedido.productos.reduce((acc, prod) => acc + prod.cantidad, 0);
+  carritoBadge.textContent = totalProductos > 0 ? totalProductos : "";
 }
-console.log(`Cliente: ${nombreCliente}`);
-alert(`¡Bienvenido ${nombreCliente}!`);
+
+//Modal carrito
+function renderizarCarritoModal() {
+  const modalCarrito = document.getElementById("contenidoCarrito");
+  modalCarrito.innerHTML = "";
+
+  if (pedido.productos.length === 0) {
+    modalCarrito.innerHTML = "<p class='text-muted'>No hay productos en el pedido.</p>";
+    return;
+  }
+
+  pedido.productos.forEach((producto) => {
+    const item = document.createElement("div");
+    item.className = "d-flex justify-content-between align-items-center border-bottom py-2";
+    item.innerHTML = `
+      <div>
+        <strong>${producto.nombre}</strong><br>
+        <small>$${producto.precio} x ${producto.cantidad} = $${producto.precio * producto.cantidad}</small>
+      </div>
+      <div>
+        <button class="btn btn-sm btn-outline-secondary me-1" onclick="modificarCantidad(${producto.id}, -1)">-</button>
+        <span>${producto.cantidad}</span>
+        <button class="btn btn-sm btn-outline-secondary ms-1" onclick="modificarCantidad(${producto.id}, 1)">+</button>
+      </div>
+    `;
+    modalCarrito.appendChild(item);
+  });
+}
+
+//Modificar pedido dentro del modal
+function modificarCantidad(idProducto, cambio) {
+  const producto = pedido.productos.find(p => p.id === idProducto);
+  if (!producto) return;
+
+  producto.cantidad += cambio;
+  if (producto.cantidad <= 0) {
+    pedido.productos = pedido.productos.filter(p => p.id !== idProducto);
+  }
+
+  actualizarResumenPedido();
+  actualizarBadgeCarrito();
+  renderizarCarritoModal();
+}
+
+//Abrir carrito
+document.getElementById("botonCarrito").addEventListener("click", () => {
+  renderizarCarritoModal();
+  const modal = new bootstrap.Modal(document.getElementById("modalCarrito"));
+  modal.show();
+});
+
+//Boton confirmar Modal
+document.getElementById("btnConfirmarModal").addEventListener("click", confirmarPedido);
+
+//Boton cancelar Modal
+document.getElementById("btnCancelarModal").addEventListener("click", cancelarPedido);
+
+//Boton confirmar pedido
+document.getElementById("btnConfirmar").addEventListener("click", confirmarPedido);
+
+//Boton cancelar pedido
+document.getElementById("btnCancelar").addEventListener("click", cancelarPedido);
+
+const modalCarrito = document.getElementById("modalCarrito");
+const botonCarrito = document.getElementById("botonCarrito");
+
+if (modalCarrito && botonCarrito) {
+    modalCarrito.addEventListener("hidden.bs.modal", () => {
+        botonCarrito.focus();
+    });
+}
+
+//botones de filtrado
+const filtroTodos = document.getElementById("filtroTodos").addEventListener("click", () => filtrarCatalogo("todos"));
+const filtroPizzas = document.getElementById("filtroPizzas").addEventListener("click", () => filtrarCatalogo("pizza"));
+const filtroSanguches = document.getElementById("filtroSanguches").addEventListener("click", () => filtrarCatalogo("sanguche"));
+const filtroBebidas = document.getElementById("filtroBebidas").addEventListener("click", () => filtrarCatalogo("bebida"));
+
+//contenedores
+const pedidosGuardados = document.getElementById("pedidosGuardados");
+const listaProductos = document.getElementById("listaProductos");
+const resumenPedido = document.getElementById("resumenPedido");
+
 mostrarPedidosGuardados();
 
 const catalogo = [
@@ -18,184 +124,176 @@ const catalogo = [
     {id: 7, codigo: "BL", nombre:"Cerveza Brhama 1 Lt", categoria: "bebida", precio: 3500},
 ];
 
+mostrarProductos(catalogo);
+
 const pedido = {
-  cliente: nombreCliente,
-  id: generarIdPedido(),
-  productos: []
+    cliente: nombreCliente,
+    id: generarIdPedido(),
+    productos: []
 };
 let opcion = "";
 
-//Funcion para generar pedido o agregar productos
-function generarPedido() {
-    const categoria = prompt("Elegí una categoría:\n0 - Volver\n1 - Pizzas\n2 - Sándwiches\n3 - Bebidas\n4 - Ver todo");
-    let categoriaElegida = "";
-
-    switch (categoria) {
-        case "0":
-            return;
-        case "1":
-            categoriaElegida = "pizza";
-            break;
-        case "2":
-            categoriaElegida = "sanguche";
-            break;
-        case "3":
-            categoriaElegida = "bebida";
-            break;
-        case "4":
-            categoriaElegida = "";
-            break;
-        default:
-            alert("Categoría no válida.");
-            return;
-    }
-
-    // Filtrar catálogo
-    let opciones;
-
-    if (categoriaElegida) {
-        opciones = catalogo.filter(function(p) {
-            return p.categoria === categoriaElegida;
-        });
-    } else {
-        opciones = catalogo;
-    }
-
-    // Mostrar productos
-    let mensaje = "Elegí un producto:\n";
-    opciones.forEach((p, i) => {
-        mensaje += `${i + 1} - ${p.nombre} ($${p.precio})\n`;
+//Funcion para renderizar el catalogo en el DOM
+function mostrarProductos(lista) {
+    listaProductos.innerHTML = "";
+    
+    lista.forEach((producto) => {
+        const div = document.createElement("div");
+        div.className = "card m-2 p-2";
+        div.innerHTML = `
+        <p class="fs-4 fw-bold">${producto.nombre}</p>
+        <p class="mb-1">Precio: <strong>$${producto.precio}</strong></p>
+        <div class="g-2 text-center">
+        <button class="btn btn-danger btn-sm" onclick="restarDelPedido(${producto.id})">-</button>
+        <button class="btn btn-success btn-sm" onclick="sumarAlPedido(${producto.id})">+</button>
+      </div>
+        `;
+        listaProductos.appendChild(div);
     });
-    mensaje += "0 - Volver";
-
-    const seleccion = parseInt(prompt(mensaje));
-    if (seleccion === 0) return;
-
-    const productoElegido = opciones[seleccion - 1];
-
-    if (!productoElegido) {
-        alert("Opción inválida.");
-        return;
-    }
-
-    const cantidad = parseInt(prompt(`¿Cuántas unidades de ${productoElegido.nombre} querés agregar?`));
-    if (isNaN(cantidad) || cantidad <= 0) {
-        alert("Cantidad inválida. No se agregó nada al pedido.");
-        return;
-    }
-
-    const existente = pedido.productos.find(p => p.id === productoElegido.id);
-
-    if (existente) {
-        existente.cantidad += cantidad;
-        alert(`Actualizaste ${productoElegido.nombre}. Nueva cantidad: ${existente.cantidad}`);
-    } else {
-        pedido.productos.push({
-            id: productoElegido.id,
-            nombre: productoElegido.nombre,
-            precio: productoElegido.precio,
-            cantidad: cantidad
-        });
-        alert(`Agregaste ${cantidad} ${productoElegido.nombre}(s) al pedido.`);
-    }
-
-    console.log("Pedido actual:", pedido.productos);
 }
 
-//Funcion para eliminar un producto no deseado
-function eliminarProducto() {
+function filtrarCatalogo(categoria) {
+    if (categoria === "todos") {
+        mostrarProductos(catalogo);
+    } else {
+        const filtrado = catalogo.filter(p => p.categoria === categoria);
+        mostrarProductos(filtrado);
+    }
+}
+
+//Funcion para agregar productos
+function sumarAlPedido(id) {
+  const producto = catalogo.find(p => p.id === id);
+  if (!producto) return;
+
+  const existente = pedido.productos.find(p => p.id === id);
+
+  if (existente) {
+    existente.cantidad++;
+  } else {
+    pedido.productos.push({ id: producto.id, nombre: producto.nombre, precio: producto.precio, cantidad: 1 });
+  }
+
+  actualizarResumenPedido();
+  actualizarBadgeCarrito();
+}
+
+//Funcion para quitar productos
+function restarDelPedido(id) {
+  const indice = pedido.productos.findIndex(p => p.id === id);
+  if (indice === -1) return;
+
+  pedido.productos[indice].cantidad--;
+
+  if (pedido.productos[indice].cantidad <= 0) {
+    pedido.productos.splice(indice, 1);
+  }
+
+  actualizarResumenPedido();
+  actualizarBadgeCarrito();
+}
+
+//Funcion para renderizar el resumen del pedido
+function actualizarResumenPedido() {
+  resumenPedido.innerHTML = "";
+
+  if (pedido.productos.length === 0) {
+    resumenPedido.innerHTML = "<p>No hay productos en el pedido.</p>";
+    return;
+  }
+
+  pedido.productos.forEach(p => {
+    const linea = document.createElement("p");
+    linea.innerText = `${p.nombre} x${p.cantidad} - $${p.precio * p.cantidad}`;
+    resumenPedido.appendChild(linea);
+  });
+
+  const total = pedido.productos.reduce((acc, p) => acc + p.precio * p.cantidad, 0);
+  const verTotal = document.createElement("p");
+  verTotal.className = "fw-bold mt-2";
+  verTotal.innerText = `Total: $${total}`;
+  resumenPedido.appendChild(verTotal);
+}
+
+//Funcion confirmar pedido
+function confirmarPedido() {
+    pedido.cliente = nombreCliente;
+
+    if (!pedido.cliente || pedido.cliente.trim() === "") {
+        Swal.fire({
+            icon: "warning",
+            title: "Nombre requerido",
+            text: "Por favor ingresá tu nombre antes de confirmar el pedido."
+        });
+        return;
+    }
+
     if (pedido.productos.length === 0) {
-        alert("No hay productos para eliminar.");
+        Swal.fire({
+            icon: "info",
+            title: "Carrito vacío",
+            text: "No hay productos en el pedido."
+        });
         return;
     }
 
-    let mensaje = "Elegí un producto para eliminar:\n";
-    pedido.productos.forEach((p, i) => {
-        mensaje += `${i + 1} - ${p.nombre} (Cantidad: ${p.cantidad})\n`;
+    const pedidosGuardados = JSON.parse(localStorage.getItem("pedidos")) || [];
+    pedidosGuardados.push(pedido);
+    localStorage.setItem("pedidos", JSON.stringify(pedidosGuardados));
+
+    pedido.productos = [];
+    actualizarResumenPedido();
+    actualizarBadgeCarrito();
+    renderizarCarritoModal();
+
+    Swal.fire({
+        icon: "success",
+        title: "¡Pedido confirmado!",
+        text: "Gracias por tu compra 😊"
     });
-    mensaje += "0 - Volver";
+}
 
-    let opcion = prompt(mensaje);
-    if (opcion === "0") return;
-
-    let i = parseInt(opcion) - 1;
-    if (isNaN(i) || i < 0 || i >= pedido.productos.length) {
-        alert("Opción inválida.");
+//Funcion cancelar pedido
+function cancelarPedido() {
+    if (pedido.productos.length === 0) {
+        Swal.fire({
+            icon: "info",
+            title: "Carrito vacío",
+            text: "No hay nada para cancelar."
+        });
         return;
     }
 
-    const producto = pedido.productos[i];
-    const accion = prompt(`Seleccionaste ${producto.nombre} (Cantidad actual: ${producto.cantidad})\n¿Querés eliminar:\n1 - Todo el producto\n2 - Solo una cantidad`).trim();
+    Swal.fire({
+        title: "¿Cancelar pedido?",
+        text: "Se eliminarán todos los productos del pedido actual.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Sí, cancelar",
+        cancelButtonText: "Volver"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            pedido.productos = [];
+            actualizarResumenPedido();
+            actualizarBadgeCarrito();
+            renderizarCarritoModal();
 
-    if (accion === "1") {
-        pedido.productos.splice(i, 1);
-        alert(`${producto.nombre} fue eliminado del pedido.`);
-    } else if (accion === "2") {
-        const cantidadAEliminar = parseInt(prompt(`¿Cuántas unidades querés eliminar?`));
-        if (isNaN(cantidadAEliminar) || cantidadAEliminar <= 0) {
-            alert("Cantidad inválida.");
-            return;
+            Swal.fire({
+                icon: "success",
+                title: "Pedido cancelado",
+                text: "El pedido fue eliminado correctamente."
+            });
         }
-
-        if (cantidadAEliminar >= producto.cantidad) {
-            pedido.productos.splice(i, 1);
-            alert(`Se eliminaron todas las unidades de ${producto.nombre}.`);
-        } else {
-            producto.cantidad -= cantidadAEliminar;
-            alert(`Se eliminaron ${cantidadAEliminar} unidades. Quedan ${producto.cantidad}.`);
-        }
-    } else {
-        alert("Opción inválida.");
-    }
-}
-
-//Funcion para armar el resumen actual del pedido
-function mostrarResumenPedido(productos) {
-    let resumen = "";
-    let total = 0;
-  
-    for (let i of productos) {
-        let subtotal = i.precio * i.cantidad;
-        resumen += `${i.nombre} x${i.cantidad} = $${subtotal}\n`;
-        total += subtotal;
-    }
-  
-    return { resumen, total };
-}
-
-//Funcion para confirmar o cancelar el pedido con validacion afirmativa o negativa
-function confirmarPedido(total) {
-    let confirmar;
-  
-    do {
-        confirmar = prompt("¿Deseás confirmar el pedido? (s/n)").toLowerCase().trim();
-    } while (confirmar !== "s" && confirmar !== "n");
-  
-    if (confirmar === "s") {
-        alert(`¡Gracias por tu pedido, ${nombreCliente}! El total es $${total}. Pronto estará listo.`);
-        console.log("Pedido confirmado. Total:", total);
-        return true;
-    } else {
-        let cancelar;
-  
-        do {
-            cancelar = prompt("¿Querés cancelar el pedido? (s/n)").toLowerCase().trim();
-        } while (cancelar !== "s" && cancelar !== "n");
-  
-        if (cancelar === "s") {
-            pedido.productos.length = 0;
-            console.log("El usuario canceló el pedido.");
-            alert("Tu pedido fue cancelado.");
-        }
-        return false;
-    }
+    });
 }
 
 //Funcion para cargar los pedidos guardados
 function cargarPedidos() {
-   const pedidosGuardados = localStorage.getItem("pedidos");
-   if (pedidosGuardados) {
-      return JSON.parse(pedidosGuardados);
+   const pedidosEnStorage = localStorage.getItem("pedidos");
+   if (pedidosEnStorage) {
+      return JSON.parse(pedidosEnStorage);
    }
    return [];
 }
@@ -206,73 +304,30 @@ function generarIdPedido() {
     return pedidos.length + 1;
 }
 
-//Funcion para mostrar el pedido actual y confirmarlo o cancelarlo
-function revisarPedido() {
-    if (pedido.productos.length === 0) {
-      alert("No hay productos en el pedido aún.");
-      return;
-    }
-  
-    const { resumen, total } = mostrarResumenPedido(pedido.productos);
-    alert("Tu pedido actual es:\n" + resumen + `Total: $${total}`);
-  
-    const confirmado = confirmarPedido(total);
-    if (confirmado) {
-        let pedidosGuardados = cargarPedidos();
-        pedidosGuardados.push(pedido);
-        localStorage.setItem("pedidos", JSON.stringify(pedidosGuardados));
-        console.log("Pedido guardado en localStorage.");
-        opcion = "4";
-    }
-}
-
 //Funcion para mostrar los pedidos.
 function mostrarPedidosGuardados() {
-    const pedidos = cargarPedidos();
+    const pedidos = cargarPedidos(); // ahora retorna bien desde localStorage
 
     if (pedidos.length === 0) {
-        alert("No hay pedidos guardados en el localStorage.");
+        pedidosGuardados.innerHTML = "<p>No hay pedidos anteriores guardados.</p>";
         return;
     }
 
-    let resumen = "Pedidos guardados:\n\n";
-    pedidos.forEach((pedido, i) => {
-        resumen += `Pedido ${i + 1} - Cliente: ${pedido.cliente}\n`;
-        pedido.productos.forEach(prod => {
-            resumen += `  ${prod.nombre} x${prod.cantidad} = $${prod.precio * prod.cantidad}\n`;
-        });
-        resumen += "------------------------\n";
-    });
+    // Armamos el HTML con map()
+    pedidosGuardados.innerHTML = pedidos.map((pedido, i) => {
+        const productos = pedido.productos.map(
+            prod => `<li>${prod.nombre} x${prod.cantidad} = $${prod.precio * prod.cantidad}</li>`
+        ).join("");
 
-    alert(resumen);
+        return `
+            <div class="card mb-3">
+                <div class="card-body">
+                    <p class="card-title fw-bold fs-5">Pedido ${i + 1} - Cliente: ${pedido.cliente}</p>
+                    <ul>${productos}</ul>
+                </div>
+            </div>
+        `;
+    }).join("");
 }
 
-//Listado de opciones
-while (opcion !== "4") {
-    opcion = prompt("¿Qué desea hacer?\n1- Generar pedido o agregar otro producto.\n2- Revisar pedido.\n3- Eliminar un producto.\n4- Salir.");
-  
-    switch (opcion) {
-        case "1":
-            generarPedido();
-            break;
-      
-        case "2":
-            revisarPedido();
-            break;
-
-        case "3":
-            eliminarProducto();
-            break;
-      
-        case "4":
-            if (pedido.productos.length === 0) {
-              alert(`Hasta luego, ${nombreCliente}. No se generó ningún pedido.`);
-            } else {
-                revisarPedido();
-            }
-            break;
-      
-        default:
-          alert("Opción no válida. Por favor, elegí una opción del menú.");
-    }
-}
+actualizarResumenPedido();
