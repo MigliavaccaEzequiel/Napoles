@@ -15,7 +15,6 @@ botonNombreCliente.addEventListener("click", () => {
     nombreCliente = nombreIngresado;
     console.log(`Cliente: ${nombreCliente}`);
 
-    // Mostrar mensaje de bienvenida
     mensajeBienvenida.innerText = `👋 ¡Bienvenido, ${nombreCliente}!`;
     mensajeBienvenida.classList.remove("text-danger");
     mensajeBienvenida.classList.add("text-warning");
@@ -306,14 +305,12 @@ function generarIdPedido() {
 
 //Funcion para mostrar los pedidos.
 function mostrarPedidosGuardados() {
-    const pedidos = cargarPedidos(); // ahora retorna bien desde localStorage
-
+    const pedidos = cargarPedidos();
     if (pedidos.length === 0) {
         pedidosGuardados.innerHTML = "<p>No hay pedidos anteriores guardados.</p>";
         return;
     }
 
-    // Armamos el HTML con map()
     pedidosGuardados.innerHTML = pedidos.map((pedido, i) => {
         const productos = pedido.productos.map(
             prod => `<li>${prod.nombre} x${prod.cantidad} = $${prod.precio * prod.cantidad}</li>`
